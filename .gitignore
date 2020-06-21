@@ -124,3 +124,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.mp4
+control system/test.py
