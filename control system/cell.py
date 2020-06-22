@@ -1,14 +1,10 @@
 import math
 import pymata_express
 import numpy
-#import Motor
-
-#motor1 = Motor()
-#motor2 = Motor()
-#motor3 = Motor()
+from motor import Motor
 
 def translate(value, leftMin, leftMax, rightMin, rightMax):
-        # Figure out how 'wide' each range is
+    # Figure out how 'wide' each range is
     leftSpan = leftMax - leftMin
     rightSpan = rightMax - rightMin
 
@@ -17,32 +13,69 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
 
     # Convert the 0-1 range into a value in the right range.
     return rightMin + (valueScaled * rightSpan)
+
+
 def constrain(val, min_val, max_val):
     return min(max_val, max(min_val, val))
 
-def Move(angle, Magnitude, w):
-    theta = angle * 1000 / 57296
-    vx = Magnitude * math.cos(theta)
-    vy = Magnitude * math.sin(theta)
-    w1 = -vx + w
-    w2 = 0.5 * vx + (math.sqrt(3) / 2.0) * vy + w
-    w3 = 0.5 * vx - (math.sqrt(3) / 2.0) * vy + w
-    w1 = constrain(w1, -150, 150)
-    w2 = constrain(w2, -150, 150)
-    w3 = constrain(w3, -150, 150)
-    w1_ccw = w1 < 0 and True or False
-    w2_ccw = w2 < 0 and True or False
-    w3_ccw = w3 < 0 and True or False
-    w1_speed =  translate(abs(w1), 0, 150, 0, 255)
-    w2_speed =  translate(abs(w2), 0, 150, 0, 255)
-    w3_speed =  translate(abs(w3), 0, 150, 0, 255)
-    #motor1.run(w1_ccw,w1_speed)
-    #motor2.run(w2_ccw,w2_speed)
-    #motor3.run(w3_ccw,w3_speed)
-    print(w1_ccw)
-    print(w1_speed)
-    print(w2_ccw)
-    print(w2_speed)
-    print(w3_ccw)
-    print(w3_speed)
-Move(90, 100, 0)
+class Cell:
+    """Cell class that represents a cell in table
+    Attributes:
+      None
+    """
+
+    def __init__(self, cell):
+        """Initialize variables used by Cell class
+        Args:
+            cell: dict represents a cell data:
+                cell.id: int 
+                cell.location: tuple
+                cell.motors: list of objects
+        """
+        self.id = cell.id
+        self.location = cell.location
+        self.motors = []
+        self.angle = self.magnitude = self.w = -1
+        for i in range(len(cell.motors)):
+            self.motors.append(
+                Motor({**cell.motors[i], "id": self.id * 10 + i}))
+
+        def getStatus(self):
+            return (self.angle, self.magnitude, self.w)
+
+        def updateStatus(self, status):
+            angle, magnitude, w = status
+            self.angle = angle
+            self.magnitude = magnitude
+            self.w = w
+
+        def move(angle, magnitude, w):
+            theta = angle * 1000 / 57296
+            vx = magnitude * math.cos(theta)
+            vy = magnitude * math.sin(theta)
+            w_= [] 
+            w_ccw= [] 
+            w_speed= []
+            w_.append(-vx + w)
+            w_.append(0.5 * vx + (math.sqrt(3) / 2.0) * vy + w)
+            w_.append(0.5 * vx - (math.sqrt(3) / 2.0) * vy + w)
+
+            for i in range(3):
+                w_[i] = constrain(w_[i], -150, 150)
+            for i in range(3):
+                w_ccw.append(w_[i] < 0 and True or False)
+            for i in range(3):
+                w_speed.append(translate(abs(w_[i]), 0, 150, 0, 255))
+            for i in range(3):
+                self.motors[i].run(w_ccw[i], w_speed[i])
+
+            self.updateStatus((angle, magnitude, w))
+
+        def stop(self):
+
+            for i in range(3):
+                self.motors[i].run(0, 0)
+            
+            
+
+
