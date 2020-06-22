@@ -7,22 +7,26 @@ class Motor:
     """
 
     def __init__(self, motor):
-        """Initialize variables used by Motor class
-        Args:
+        """Initialize variables used by Motor class \n
+        @Args: \n
             motor: dict represents motor data:
                 motor.id: int
                 motor.pins: dict:
-                    {'digital':tuple, 'pwm': int, 'digMaster': boolean, 'pwmMaster': boolean}
+                    {'digital':tuple, 'pwm': int}
         """
-        self.id = motor.id
-        self.pins = motor.pins
+        self.id = motor['id']
+        self.pins = motor['pins']
+        self.code = motor['code']
         self.pinsValues = (0, 0, 0)
+
     def getStatus(self):
-        return (pins, pinsValues)
+        return (self.pins, self.pinsValues)
 
     def setValues(self, newValues):
         self.pinsValues = newValues
 
-    def run(self, cw, speed):
-        self.setValues(cw, not cw, speed)
-        
+    def run(self, cw, speed, control=False):
+        newValues = (cw, not cw, speed)
+        if control:
+            handleMotor(self.pins, self.code)
+        self.setValues(newValues)
