@@ -125,3 +125,4 @@ dmypy.json
 .pyre/
 *.mp4
 control system/test.py
+control system/.vscode/settings.json
