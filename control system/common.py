@@ -1,4 +1,4 @@
-def translate(value, leftMin, leftMax, rightMin, rightMax):
+def mapping(value, leftMin, leftMax, rightMin, rightMax):
     # Figure out how 'wide' each range is
     leftSpan = leftMax - leftMin
     rightSpan = rightMax - rightMin

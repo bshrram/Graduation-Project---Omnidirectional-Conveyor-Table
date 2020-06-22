@@ -23,8 +23,7 @@ class Cell:
         self.motors = []
         self.angle = self.magnitude = self.w = -1
         for i in range(len(cell.motors)):
-            self.motors.append(
-                Motor({**cell.motors[i], "id": self.id * 10 + i}))
+            self.motors.append(Motor({**cell.motors[i], "id": self.id * 10 + i}))
 
         def getStatus(self):
             return (self.angle, self.magnitude, self.w)
@@ -51,7 +50,7 @@ class Cell:
             for i in range(3):
                 w_ccw.append(w_[i] < 0 and True or False)
             for i in range(3):
-                w_speed.append(translate(abs(w_[i]), 0, 150, 0, 255))
+                w_speed.append(mapping(abs(w_[i]), 0, 150, 0, 255))
             for i in range(3):
                 self.motors[i].run(w_ccw[i], w_speed[i])
 
