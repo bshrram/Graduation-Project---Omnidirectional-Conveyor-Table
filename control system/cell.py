@@ -1,29 +1,31 @@
 import math
-import pymata_express
 import numpy
 from motor import Motor
 from common import *
 
 class Cell:
-    """Cell class that represents a cell in table
+    """Cell class that represents a cell in table \n
     Attributes:
       None
     """
 
     def __init__(self, cell):
-        """Initialize variables used by Cell class
-        Args:
+        """Initialize variables used by Cell class \n
+        Args: \n
             cell: dict represents a cell data:
                 cell.id: int 
                 cell.location: tuple
+                cell.code: int
                 cell.motors: list of objects
         """
-        self.id = cell.id
-        self.location = cell.location
+        self.id = cell['id']
+        self.location = cell['location']
+        self.code = cell['code']
         self.motors = []
         self.angle = self.magnitude = self.w = -1
-        for i in range(len(cell.motors)):
-            self.motors.append(Motor({**cell.motors[i], "id": self.id * 10 + i}))
+        for i in range(len(cell['motors'])):
+            self.motors.append(
+                Motor({'id': self.id * 10 + i, **cell.motors[i],  'code': self.code}))
 
         def getStatus(self):
             return (self.angle, self.magnitude, self.w)
@@ -53,11 +55,9 @@ class Cell:
                 w_speed.append(mapping(abs(w_[i]), 0, 150, 0, 255))
             for i in range(3):
                 self.motors[i].run(w_ccw[i], w_speed[i])
-
             self.updateStatus((angle, magnitude, w))
 
         def stop(self):
-
             for i in range(3):
                 self.motors[i].run(0, 0)
             
