@@ -24,7 +24,7 @@ class Cell:
                 Motor({**cell.motors[i], "id": self.id * 10 + i}))
         
         def getStatus(self):
-            return (self.angle, )
+            return (self.angle, self.magnitude, self.w)
 
         def move(self, angle, magnitude, w):
             #Todo @ali
