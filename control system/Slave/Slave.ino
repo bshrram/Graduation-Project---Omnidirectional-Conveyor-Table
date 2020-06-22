@@ -66,23 +66,32 @@ void receiveEvent(int howMany)
   q.push(&b);
 }
 
-//*** cell handle
-// @param x: array with 7 items [cellId, dig1, dig2, dig3, pwm1, pwm2, pwm3]
-void handleCell(int a[])
+/*handleMotor:
+  Args: 
+    a: array with pins & values
+*/
+void handleMotor(int a[])
 {
-  int Code = a[0];
+  int code = a[0];
+  /*code: 
+    1: digital in slave, pwm in master
+    2: digital in master, pwm in slave
+    3: digital & pwm in slave
+    4: digital & pwm in master
+  */
 
-  if (a[0] == 1)
+  if (code == 1)
   {
     digitalWrite(a[1], a[2]);
     digitalWrite(a[1] - 1, !a[2]);
   }
 
-  else if (a[0] == 2)
+  else if (code == 2)
   {
     analogWrite(a[1], a[2]);
   }
-  else if (a[0] == 3)
+
+  else if (code == 3)
   {
     digitalWrite(a[1], a[2]);
     digitalWrite(a[1] - 1, !a[2]);
@@ -97,6 +106,6 @@ void loop()
   {
     int *x;
     q.pop(&x);
-    handleCell(x);
+    handleMotor(x);
   }
 }
