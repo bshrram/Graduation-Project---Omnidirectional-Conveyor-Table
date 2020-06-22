@@ -26,6 +26,13 @@ class Cell:
         def getStatus(self):
             return (self.angle, self.magnitude, self.w)
 
+
+        def updateStatus(self, status):
+            angle, magnitude, w = status
+            self.angle = angle
+            self.magnitude = magnitude
+            self.w = w
+
         def move(self, angle, magnitude, w):
             #Todo @ali
             pass 
