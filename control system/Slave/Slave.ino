@@ -73,11 +73,11 @@ void receiveEvent(int howMany)
 void handleMotor(int a[])
 {
   int code = a[0];
-  /*code: 
-    1: digital in slave, pwm in master
-    2: digital in master, pwm in slave
-    3: digital & pwm in slave
-    4: digital & pwm in master
+  /*code: int: 
+      1: digital in slave, pwm in master
+      2: digital & pwm in slave
+      3: digital in master, pwm in slave
+      4: digital & pwm in master
   */
 
   if (code == 1)
