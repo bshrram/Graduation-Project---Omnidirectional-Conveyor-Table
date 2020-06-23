@@ -126,3 +126,4 @@ dmypy.json
 *.mp4
 control system/test.py
 control system/.vscode/settings.json
+test.py
