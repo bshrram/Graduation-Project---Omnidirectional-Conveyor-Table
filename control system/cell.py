@@ -60,7 +60,3 @@ class Cell:
     def stop(self):
         for i in range(3):
             self.motors[i].run(0, 0)
-        
-            
-
-
