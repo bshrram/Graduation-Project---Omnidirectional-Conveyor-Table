@@ -88,14 +88,14 @@ void handleMotor(int a[])
 
   else if (code == 2)
   {
-    analogWrite(a[1], a[2]);
+    digitalWrite(a[1], a[2]);
+    digitalWrite(a[1] - 1, !a[2]);
+    analogWrite(a[3], a[4]);
   }
 
   else if (code == 3)
   {
-    digitalWrite(a[1], a[2]);
-    digitalWrite(a[1] - 1, !a[2]);
-    analogWrite(a[3], a[4]);
+        analogWrite(a[1], a[2]);
   }
 }
 
