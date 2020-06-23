@@ -25,42 +25,42 @@ class Cell:
         self.angle = self.magnitude = self.w = -1
         for i in range(len(cell['motors'])):
             self.motors.append(
-                Motor({'id': self.id * 10 + i, **cell.motors[i],  'code': self.code}))
+                Motor({'id': self.id * 10 + i, **cell['motors'][i],  'code': self.code}))
 
-        def getStatus(self):
-            return (self.angle, self.magnitude, self.w)
+    def getStatus(self):
+        return (self.angle, self.magnitude, self.w)
 
-        def updateStatus(self, status):
-            angle, magnitude, w = status
-            self.angle = angle
-            self.magnitude = magnitude
-            self.w = w
+    def updateStatus(self, status):
+        angle, magnitude, w = status
+        self.angle = angle
+        self.magnitude = magnitude
+        self.w = w
 
-        def move(angle, magnitude, w):
-            theta = angle * 1000 / 57296
-            vx = magnitude * math.cos(theta)
-            vy = magnitude * math.sin(theta)
-            w_= [] 
-            w_ccw= [] 
-            w_speed= []
-            w_.append(-vx + w)
-            w_.append(0.5 * vx + (math.sqrt(3) / 2.0) * vy + w)
-            w_.append(0.5 * vx - (math.sqrt(3) / 2.0) * vy + w)
+    def move(self, angle, magnitude, w):
+        theta = angle * 1000 / 57296
+        vx = magnitude * math.cos(theta)
+        vy = magnitude * math.sin(theta)
+        w_= [] 
+        w_ccw= [] 
+        w_speed= []
+        w_.append(-vx + w)
+        w_.append(0.5 * vx + (math.sqrt(3) / 2.0) * vy + w)
+        w_.append(0.5 * vx - (math.sqrt(3) / 2.0) * vy + w)
 
-            for i in range(3):
-                w_[i] = constrain(w_[i], -150, 150)
-            for i in range(3):
-                w_ccw.append(w_[i] < 0 and True or False)
-            for i in range(3):
-                w_speed.append(mapping(abs(w_[i]), 0, 150, 0, 255))
-            for i in range(3):
-                self.motors[i].run(w_ccw[i], w_speed[i])
-            self.updateStatus((angle, magnitude, w))
+        for i in range(3):
+            w_[i] = constrain(w_[i], -150, 150)
+        for i in range(3):
+            w_ccw.append(w_[i] < 0 and True or False)
+        for i in range(3):
+            w_speed.append(mapping(abs(w_[i]), 0, 150, 0, 255))
+        for i in range(3):
+            self.motors[i].run(w_ccw[i], w_speed[i])
+        self.updateStatus((angle, magnitude, w))
 
-        def stop(self):
-            for i in range(3):
-                self.motors[i].run(0, 0)
-            
+    def stop(self):
+        for i in range(3):
+            self.motors[i].run(0, 0)
+        
             
 
 

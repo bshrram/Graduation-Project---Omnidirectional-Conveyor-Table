@@ -21,3 +21,7 @@ class Table:
                 cell: cell object
         """
         self.append(Cell(cell))
+
+    def getCellByLocation(self, location):
+        myCell = next((i for i in self.cells if i.location == location), None)
+        return myCell

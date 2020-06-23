@@ -1,4 +1,4 @@
-from pymata4 import pymata4
+#from pymata4 import pymata4
 
 def init_pins():
     pass
@@ -17,4 +17,4 @@ def handleMotor(pins, code):  # **** TODO
     
 
 
-board = pymata4.Pymata4()
+#board = pymata4.Pymata4()
