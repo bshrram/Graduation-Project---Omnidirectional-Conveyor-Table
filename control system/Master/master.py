@@ -10,8 +10,8 @@ def handleMotor(pins, code):  # **** TODO
         pins: dict
         code: int: 
             1: digital in slave, pwm in master
-            2: digital in master, pwm in slave
-            3: digital & pwm in slave
+            2: digital & pwm in slave
+            3: digital in master, pwm in slave
             4: digital & pwm in master
     """
     
