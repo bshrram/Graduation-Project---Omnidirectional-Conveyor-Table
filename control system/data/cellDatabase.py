@@ -4,13 +4,13 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.par
 from table import Table 
 
 ids = [
-    [11, ],
+    [11, 21, ],
     []
 ]
 
 cellDatabase = [
     {
-        'id': 11,
+        'id': ids[0][0],
         'location': [0, 0],
         'code': 1,
         'motors': [
@@ -20,7 +20,7 @@ cellDatabase = [
         ]
     },
     {
-        'id': 12,
+        'id': ids[],
         'location': [0, 0],
         'code': 1,
         'motors': [
