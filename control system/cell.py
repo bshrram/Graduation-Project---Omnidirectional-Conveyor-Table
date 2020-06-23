@@ -14,7 +14,7 @@ class Cell:
         Args: \n
             cell: dict represents a cell data:
                 cell.id: int 
-                cell.location: tuple
+                cell.location: list
                 cell.code: int
                 cell.motors: list of objects
         """
