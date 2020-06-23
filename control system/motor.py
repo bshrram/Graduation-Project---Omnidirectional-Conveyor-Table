@@ -28,5 +28,5 @@ class Motor:
     def run(self, cw, speed, control=False):
         newValues = (cw, not cw, speed)
         if control:
-            handleMotor(self.pins, self.code)
+            handleMotor(self.pins, self.code, newValues)
         self.setValues(newValues)
