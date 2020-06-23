@@ -36,7 +36,7 @@ class Cell:
         self.magnitude = magnitude
         self.w = w
 
-    def move(self, angle, magnitude, w):
+    def move(self, angle, magnitude, w, commonCells):
         theta = angle * 1000 / 57296
         vx = magnitude * math.cos(theta)
         vy = magnitude * math.sin(theta)
@@ -54,8 +54,13 @@ class Cell:
         for i in range(3):
             w_speed.append(mapping(abs(w_[i]), 0, 150, 0, 255))
         for i in range(3):
-            self.motors[i].run(w_ccw[i], w_speed[i])
+            self.motors[i].run(w_ccw[i], w_speed[i], True)
         self.updateStatus((angle, magnitude, w))
+
+        for i in range(len(commonCells)):
+            commonCells[i].updateStatus((angle, magnitude, w))
+            for j in range(3):
+                commonCells[i].motors[j].run(w_ccw[j], w_speed[j], False)
 
     def stop(self):
         for i in range(3):
