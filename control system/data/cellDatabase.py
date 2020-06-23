@@ -1,9 +1,4 @@
 from table import Table
-import sys
-import os
-from pathlib import Path
-sys.path.append(os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), os.pardir))
 
 ids = [
     [11, 81, 32, 52, 13],
@@ -203,9 +198,3 @@ for i in range(5):
         cellDatabase[k]['id'] = ids[i][j]
         cellDatabase[k]['location'] = [i, j]
         k += 1
-
-table = Table(cellDatabase)
-cell = table.getCellByLocation([0, 1])
-# print(cell.__dict__)
-status = cell.getStatus()
-print(status)
