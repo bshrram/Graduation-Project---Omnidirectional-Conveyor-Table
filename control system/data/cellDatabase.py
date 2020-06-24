@@ -1,4 +1,3 @@
-from table import Table
 
 ids = [
     [11, 81, 32, 52, 13],
