@@ -30,3 +30,9 @@ class Motor:
         if control:
             handleMotor(self.pins, self.code, newValues)
         self.setValues(newValues)
+
+    def stop(self, control=False):
+        newValues = (0, 0, 0)
+        if control:
+            handleMotor(self.pins, self.code, newValues)
+        self.setValues(newValues)

@@ -8,7 +8,7 @@ void setup()
 {
   for (int i = 2; i <= 53; i++)
   {
-    if (i == 20 || i == 21)
+    if (i>13 && i<22)
       continue;
     pinMode(i, OUTPUT);
   }
@@ -45,14 +45,14 @@ void handleMotor(int a[])
   if (code == 1)
   {
     digitalWrite(a[1], a[2]);
-    digitalWrite(a[1] - 1, !a[2]);
+    digitalWrite(a[1] - 1, a[3]);
   }
 
   else if (code == 2)
   {
     digitalWrite(a[1], a[2]);
-    digitalWrite(a[1] - 1, !a[2]);
-    analogWrite(a[3], a[4]);
+    digitalWrite(a[1] - 1, a[3]);
+    analogWrite(a[4], a[5]);
   }
 
   else if (code == 3)

@@ -7,8 +7,8 @@ def mapping(value, leftMin, leftMax, rightMin, rightMax):
     valueScaled = float(value - leftMin) / float(leftSpan)
 
     # Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan)
+    return int(rightMin + (valueScaled * rightSpan))
 
 
 def constrain(val, min_val, max_val):
-    return min(max_val, max(min_val, val))
+    return int(min(max_val, max(min_val, val)))

@@ -20,8 +20,13 @@ class Table:
             Args:
                 cell: cell object
         """
-        self.append(Cell(cell))
+        self.cells.append(Cell(cell))
 
     def getCellByLocation(self, location):
         myCell = next((i for i in self.cells if i.location == location), None)
         return myCell
+
+    def getCommonCells(self, cell):
+        id = cell.id/10
+        commCells = [i for i in self.cells if i.id/10 == id]
+        return commCells

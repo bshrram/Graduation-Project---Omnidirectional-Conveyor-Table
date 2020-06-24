@@ -62,6 +62,12 @@ class Cell:
             for j in range(3):
                 commonCells[i].motors[j].run(w_ccw[j], w_speed[j], False)
 
-    def stop(self):
+    def stop(self, commonCells):
         for i in range(3):
-            self.motors[i].run(0, 0)
+            self.motors[i].stop(True)
+        self.updateStatus((-1, -1, -1))
+        for i in range(len(commonCells)):
+            commonCells[i].updateStatus((-1, -1, -1))
+            for j in range(3):
+                commonCells[i].motors[j].stop(False)
+        
