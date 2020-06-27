@@ -19,7 +19,7 @@ if args.algo == 'MOG2':
 elif args.algo == 'KNN':
     detector = Detector(type ="KNN")
 elif args.algo == 'COLOR':
-    lower_blue = np.array([100,50,50])
+    lower_blue = np.array([110,50,50])
     upper_blue = np.array([130,255,255])
     detector = Detector(type="COLOR", color= (lower_blue, upper_blue))
 
@@ -28,7 +28,8 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (0, 255, 255), (255, 0, 255), (255, 127, 255),
                     (127, 0, 255), (127, 0, 127)]
 
-capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
+#capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
+capture = cv.VideoCapture('http://192.168.1.108:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
