@@ -1,19 +1,3 @@
-#!/usr/bin/env python
-
-'''
-Feature-based image matching sample.
-
-Note, that you will need the https://github.com/opencv/opencv_contrib repo for SIFT and SURF
-
-USAGE
-  find_obj.py [--feature=<sift|surf|orb|akaze|brisk>[-flann]] [ <image1> <image2> ]
-
-  --feature  - Feature to use. Can be sift, surf, orb or brisk. Append '-flann'
-               to feature name to use Flann-based matcher instead bruteforce.
-
-  Press left mouse button on a feature point to see its matching point.
-'''
-
 # Python 2/3 compatibility
 from __future__ import print_function
 
@@ -35,7 +19,7 @@ def init_feature(name):
         detector = cv.xfeatures2d.SURF_create(800)
         norm = cv.NORM_L2
     elif chunks[0] == 'orb':
-        detector = cv.ORB_create(100)
+        detector = cv.ORB_create(3000)
         norm = cv.NORM_HAMMING
     elif chunks[0] == 'akaze':
         detector = cv.AKAZE_create()
@@ -45,21 +29,11 @@ def init_feature(name):
         norm = cv.NORM_HAMMING
     else:
         return None, None
-    if 'flann' in chunks:
-        if norm == cv.NORM_L2:
-            flann_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        else:
-            flann_params= dict(algorithm = FLANN_INDEX_LSH,
-                               table_number = 6, # 12
-                               key_size = 12,     # 20
-                               multi_probe_level = 1) #2
-        matcher = cv.FlannBasedMatcher(flann_params, {})  # bug : need to pass empty dict (#1329)
-    else:
-        matcher = cv.BFMatcher(norm)
+    matcher = cv.BFMatcher(norm)
     return detector, matcher
 
 
-def filter_matches(kp1, kp2, matches, ratio = 0.75):
+def filter_matches(kp1, kp2, matches, ratio = 0.8):
     mkp1, mkp2 = [], []
     for m in matches:
         if len(m) == 2 and m[0].distance < m[1].distance * ratio:
@@ -162,7 +136,7 @@ def main():
     import sys, getopt
     opts, args = getopt.getopt(sys.argv[1:], '', ['feature='])
     opts = dict(opts)
-    feature_name = opts.get('--feature', 'brisk')
+    feature_name = opts.get('--feature', 'orb')
     try:
         fn1, fn2 = args
     except:
@@ -176,7 +150,8 @@ def main():
     img1 = cv.resize(img1, (width,height))
 
     #img2 = cv.imread(cv.samples.findFile(fn2), cv.IMREAD_GRAYSCALE)
-    capture = cv.VideoCapture(cv.samples.findFileOrKeep("data/videos/10.mp4"))
+   # capture = cv.VideoCapture(cv.samples.findFileOrKeep("data/videos/10.mp4"))
+    capture = cv.VideoCapture('http://192.168.1.108:8080/video')
     frames = 0
     while True:
         ret, frame = capture.read()
