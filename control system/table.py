@@ -30,3 +30,6 @@ class Table:
         id = cell.id/10
         commCells = [i for i in self.cells if i.id/10 == id]
         return commCells
+
+    def getCellByNearLocation(self, location):
+        pass
