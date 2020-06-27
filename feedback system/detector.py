@@ -86,7 +86,7 @@ class Detector:
         contours_image = cv.drawContours(
             contours_image, newConts, -1, (0, 255, 0), 3)
         angles = orientations(newConts)
-
+        print(angles)
         cv.rectangle(contours_image, (10, 2),
                         (100, 20), (255, 255, 255), -1)
         cv.putText(contours_image, str(angles), (15, 15),
