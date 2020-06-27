@@ -45,6 +45,8 @@ void handleMotor(int a[])
   if (code == 1)
   {
     digitalWrite(a[1], a[2]);
+    if (a[1]==47)
+      a[1]=39;
     digitalWrite(a[1] - 1, a[3]);
   }
 
