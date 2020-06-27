@@ -1,12 +1,4 @@
-'''
-    File name         : common.py
-    File Description  : Common debug functions
-    Author            : Srini Ananthakrishnan
-    Date created      : 07/14/2017
-    Date last modified: 07/14/2017
-    Python Version    : 2.7
-'''
-
+import numpy as np
 
 def dprint(*args, **kwargs):
     """Debug print function using inbuilt print
@@ -18,3 +10,13 @@ def dprint(*args, **kwargs):
     """
     # print(*args, **kwargs)
     pass
+
+def anorm2(a):
+    return (a*a).sum(-1)
+
+def anorm(a):
+    return np.sqrt( anorm2(a) )
+
+def getsize(img):
+    h, w = img.shape[:2]
+    return w, h
