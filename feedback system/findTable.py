@@ -50,12 +50,12 @@ c = []
 def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
     h1, w1 = img1.shape[:2]
     h2, w2 = img2.shape[:2]
-    vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
-    vis[:h1, :w1] = img1
-    vis[:h2, w1:w1+w2] = img2
+    vis = np.zeros((max(h1, h2), w1+w2, 3), np.uint8)
+    print (img1)
+    vis[:h1, :w1, :3] = img1
+    vis[:h2, w1:w1+w2, :3] = img2
     img3 = vis
     h3, w3 = img3.shape[:2]
-    vis = cv.cvtColor(vis, cv.COLOR_GRAY2BGR)
 
     if H is not None:
         corners = np.float32([[0, 0], [w1, 0], [w1, h1], [0, h1]])
@@ -92,7 +92,7 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
         if inlier:
             cv.line(vis, (x1, y1), (x2, y2), green)
 
-    cv.imshow(win, vis)
+    #cv.imshow(win, vis)
     pts1 = corners1
     pts2 = np.float32([[0,0],[w1,0],[w1,h1], [0,h1]])
     print(pts2)
@@ -102,11 +102,11 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
     dst = cv.warpPerspective(img3,M,(w1,h1))
 
     # plt.subplot(),plt.imshow(dst),plt.title('Output')
-    cv.imshow('dst', dst)
+    #cv.imshow('dst', dst)
     
     # plt.subplot(121),plt.imshow(vis),plt.title('Output')
-    plt.show()
-
+    #plt.show()
+    return corners1
 
     def onmouse(event, x, y, flags, param):
         cur_vis = vis
@@ -127,81 +127,52 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
             cur_vis = cv.drawKeypoints(cur_vis, kp1s, None, flags=4, color=kp_color)
             cur_vis[:,w1:] = cv.drawKeypoints(cur_vis[:,w1:], kp2s, None, flags=4, color=kp_color)
 
-        cv.imshow(win, cur_vis)
+        #cv.imshow(win, cur_vis)
     cv.setMouseCallback(win, onmouse)
     return vis
 
 
-def main():
-    import sys, getopt
-    opts, args = getopt.getopt(sys.argv[1:], '', ['feature='])
-    opts = dict(opts)
-    feature_name = opts.get('--feature', 'orb')
-    try:
-        fn1, fn2 = args
-    except:
-        fn1 = 'table.jpg'
-        fn2 = 'table1.jpg'
-
-    scale_percent =15
-    img1 = cv.imread(cv.samples.findFile(fn1), cv.IMREAD_GRAYSCALE)
-    width = int(img1.shape[1] * scale_percent / 100)
-    height = int(img1.shape[0] * scale_percent / 100)
-    img1 = cv.resize(img1, (width,height))
-
-    #img2 = cv.imread(cv.samples.findFile(fn2), cv.IMREAD_GRAYSCALE)
-   # capture = cv.VideoCapture(cv.samples.findFileOrKeep("data/videos/10.mp4"))
-    capture = cv.VideoCapture('http://192.168.1.108:8080/video')
-    frames = 0
-    while True:
-        ret, frame = capture.read()
-        if frame is None:
-            break
-        scale_percent =100
-        frame = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
-        width = int(frame.shape[1] * scale_percent / 100)
-        height = int(frame.shape[0] * scale_percent / 100)
-        frame = cv.resize(frame, (width,height))
-        detector, matcher = init_feature(feature_name)
-
-    # if img1 is None:
-    #     print('Failed to load fn1:', fn1)
-    #     sys.exit(1)
-
-    # if img2 is None:
-    #     print('Failed to load fn2:', fn2)
-    #     sys.exit(1)
-
-    # if detector is None:
-    #     print('unknown feature:', feature_name)
-    #     sys.exit(1)
-
-        print('using', feature_name)
-
-        kp1, desc1 = detector.detectAndCompute(img1, None)
-        kp2, desc2 = detector.detectAndCompute(frame, None)
-        print('img1 - %d features, img2 - %d features' % (len(kp1), len(kp2)))
-
-        def match_and_draw(win):
-            print('matching...')
-            raw_matches = matcher.knnMatch(desc1, trainDescriptors = desc2, k = 2) #2
-            p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
-            if len(p1) >= 4:
-                H, status = cv.findHomography(p1, p2, cv.RANSAC, 5.0)
-                print('%d / %d  inliers/matched' % (np.sum(status), len(status)))
-            else:
-                H, status = None, None
-                print('%d matches found, not enough for homography estimation' % len(p1))
-
-            _vis = explore_match(win, img1, frame, kp_pairs, status, H)
-
-        match_and_draw('find_obj')
-        cv.waitKey(10)
-
-    print('Done')
+scale_percent =15
+img1 = cv.imread(cv.samples.findFile('table.jpg'))
+width = int(img1.shape[1] * scale_percent / 100)
+height = int(img1.shape[0] * scale_percent / 100)
+img1 = cv.resize(img1, (width,height))
 
 
-if __name__ == '__main__':
-    print(__doc__)
-    main()
-    cv.destroyAllWindows()
+detector, matcher = init_feature('orb')
+kp1, desc1 = detector.detectAndCompute(img1, None)
+
+def getCorners(frame):
+    scale_percent =100
+    #frame = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+    width = int(frame.shape[1] * scale_percent / 100)
+    height = int(frame.shape[0] * scale_percent / 100)
+    frame = cv.resize(frame, (width,height))
+    
+    kp2, desc2 = detector.detectAndCompute(frame, None)
+
+    print('matching...')
+    raw_matches = matcher.knnMatch(desc1, trainDescriptors = desc2, k = 2) #2
+    p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
+    if len(p1) >= 4:
+        H, status = cv.findHomography(p1, p2, cv.RANSAC, 5.0)
+        print('%d / %d  inliers/matched' % (np.sum(status), len(status)))
+    else:
+        H, status = None, None
+        print('%d matches found, not enough for homography estimation' % len(p1))
+
+    _vis = explore_match('find_table', img1, frame, kp_pairs, status, H)
+    return _vis
+
+def getTableFromFrame (corners, frame):
+    h1, w1 = img1.shape[:2]
+    h2, w2 = frame.shape[:2]
+    vis = np.zeros((max(h1, h2), w1+w2, 3), np.uint8)
+    vis[:h1, :w1, :3] = img1
+    vis[:h2, w1:w1+w2, :3] = frame
+    pts1 = corners
+    pts2 = np.float32([[0,0],[w1,0],[w1,h1], [0,h1]])
+    M = cv.getPerspectiveTransform(pts1,pts2)
+    print((w1, h1))
+    dst = cv.warpPerspective(vis, M,(w1,h1))
+    return dst

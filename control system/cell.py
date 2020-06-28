@@ -15,11 +15,14 @@ class Cell:
             cell: dict represents a cell data:
                 cell.id: int 
                 cell.location: list
+                cell.coordinates: tuple
                 cell.code: int
                 cell.motors: list of objects
         """
+
         self.id = cell['id']
         self.location = cell['location']
+        self.coordinates=cell['coordinates']
         self.code = cell['code']
         self.motors = []
         self.angle = self.magnitude = self.w = -1

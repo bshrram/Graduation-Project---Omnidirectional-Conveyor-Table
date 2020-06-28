@@ -1,10 +1,13 @@
 from cell import Cell
+from common import *
+
 
 class Table:
     """Table class that contains cells
     Attributes:
         None
     """
+
     def __init__(self, cells):
         """Initialize variables used by Table class
         Args:
@@ -14,7 +17,6 @@ class Table:
         for i in range(len(cells)):
             self.cells.append(Cell(cells[i]))
 
-    
     def addCell(self, cell):
         """Add cell to tabel.cells
             Args:
@@ -31,5 +33,16 @@ class Table:
         commCells = [i for i in self.cells if i.id/10 == id]
         return commCells
 
-    def getCellByNearLocation(self, location):
-        pass
+    def getCellsByNearLocation(self, location, howMany):
+        distance = []
+        ret = []
+        for i in range(20):
+            r = calculateDistance(location, self.cells[i].coordinates)
+            distance.append((r, i))
+        distance.sort()
+        distance=distance[:howMany]
+        result = []
+        for i in range(howMany):
+            result.append(self.cells[distance[i][1]])
+            print((distance[i][0], result[i].location, result[i].coordinates))
+        return result

@@ -1,3 +1,4 @@
+import math
 def mapping(value, leftMin, leftMax, rightMin, rightMax):
     # Figure out how 'wide' each range is
     leftSpan = leftMax - leftMin
@@ -12,3 +13,10 @@ def mapping(value, leftMin, leftMax, rightMin, rightMax):
 
 def constrain(val, min_val, max_val):
     return int(min(max_val, max(min_val, val)))
+
+def calculateDistance(l1, l2):
+    (x1, y1) = l1
+    (x2, y2) = l2
+    dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return dist 
+    
