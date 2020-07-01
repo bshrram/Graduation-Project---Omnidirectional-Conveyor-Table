@@ -132,7 +132,7 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
     return vis
 
 
-scale_percent =15
+scale_percent =30
 img1 = cv.imread(cv.samples.findFile('table.jpg'))
 width = int(img1.shape[1] * scale_percent / 100)
 height = int(img1.shape[0] * scale_percent / 100)
@@ -173,6 +173,6 @@ def getTableFromFrame (corners, frame):
     pts1 = corners
     pts2 = np.float32([[0,0],[w1,0],[w1,h1], [0,h1]])
     M = cv.getPerspectiveTransform(pts1,pts2)
-    print((w1, h1))
+    # print((w1, h1))
     dst = cv.warpPerspective(vis, M,(w1,h1))
     return dst

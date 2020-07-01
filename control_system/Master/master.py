@@ -1,6 +1,7 @@
 from pymata4 import pymata4
 
-board = pymata4.Pymata4(com_port="COM9")
+#board = pymata4.Pymata4(com_port="COM9")
+board = pymata4.Pymata4()
 board.set_pin_mode_i2c()
 
 for i in range(2,14):
@@ -29,9 +30,9 @@ def handleMotor(pins, code, newValues):  # **** TODO
     d1, d2 = pins['digital'] 
     pwm = pins['pwm']
     d1v, d2v, pwmv = newValues
-    print(("pwm", pwm, pwmv))
-    print(("d1", d1, d1v))
-    print(("d2", d2, d2v))
+    # print(("pwm", pwm, pwmv))
+    # print(("d1", d1, d1v))
+    # print(("d2", d2, d2v))
     
     if code == 1:
         board.i2c_write(8, [code, d1, d1v, d2v])
