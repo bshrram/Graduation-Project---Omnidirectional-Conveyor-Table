@@ -31,7 +31,7 @@ class Cell:
                 Motor({'id': self.id * 10 + i, **cell['motors'][i],  'code': self.code}))
 
     def __eq__(self, other): 
-        return self.id/10 == other.id/10
+        return self.id/10  == other.id/10
     
     def __str__(self):
         return self.location
@@ -49,9 +49,6 @@ class Cell:
         self.w = w
 
     def move(self, angle, magnitude, w, commonCells):
-        angle -= 90
-        if angle <0:
-            angle = 360 + angle
         theta = angle * 1000 / 57296
         vx = magnitude * math.cos(theta)
         vy = magnitude * math.sin(theta)
