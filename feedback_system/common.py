@@ -28,6 +28,13 @@ def pixelToMm(location,w1,h1):
     # print(w1, h1)
     return (xm, ym)
 
+def mmToPixel(location,w1,h1):
+    (x,y)= location
+    xp = int(x * w1/1150)
+    yp =  int(y * h1/800)
+    # print(w1, h1)
+    return (xp, yp)
+
 import math
 def mapping(value, leftMin, leftMax, rightMin, rightMax):
     # Figure out how 'wide' each range is
