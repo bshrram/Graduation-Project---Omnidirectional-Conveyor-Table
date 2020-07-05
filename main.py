@@ -36,7 +36,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (127, 0, 255), (127, 0, 127)]
 
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.107:8080/video')
+capture = cv.VideoCapture('http://192.168.1.106:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
@@ -45,9 +45,10 @@ frames =0
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[0,4], [3,4], [1,2], [3,0], [0,0]]
+locations = [[1,3],[1,2], [1,1], [2,1]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
+rot = False
 while True:
     keyboard = cv.waitKey(1)
     if keyboard == 'q' or keyboard == 27:
@@ -79,17 +80,54 @@ while True:
         continue
     corners = np.float32(corners)
     frame = getTableFromFrame(corners, frame)
-    centers = detector.Detect(frame)
+    (centers, angles) = detector.Detect(frame)
     h1, w1 = frame.shape[:2]
     if len(centers) == 0:
         continue
 
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
+    angle = angles[0][0]
     runningCells = myTable.getCellsByNearLocation(centersMM, 4)
-
-    if calculateDistance(centersMM, endCells[index].coordinates) < 100:
+    if calculateDistance(centersMM, endCells[index].coordinates) < 75:
+        #  rot = True
         index = (index+1) %len(locations)
-    myTable.goToCell(endCells[index], runningCells)
+    # else:
+    #     rot = False
+    if (rot):
+        endAngle = myTable.getAngle(endCells[index].coordinates, endCells[(index+1) % len(locations)].coordinates)
+        angle += 90
+        angle %= 180
+        endAngle %= 180
+        w = endAngle - angle
+        print(angle, endAngle)
+        # print (w)
+        # print(f"rotating {endCells[index].location}")
+        if (abs(w)< 10):
+            index = (index+1) %len(locations)
+            rot = False
+            continue
+        w = 70
+        myTable.move(endCells[index], 0, 0, w)
+        [x, y] = endCells[index].location 
+        dx = [-1, 1, 0]
+        if x%2 ==1:
+            dy = [0, 0, 1]
+        else:
+            dy = [-1, -1, 1]
+        rotatingCells = []
+        for i in range(len(dx)):
+            cell = myTable.getCellByLocation([x + dx[i], y+ dy[i]])
+            if cell is not None:
+                rotatingCells.append(cell)
+        
+        for i in range(len(rotatingCells)):
+            if rotatingCells[i].id == endCells[index].id:
+                continue
+            myTable.move(rotatingCells[i], 0, 0, -w)
+
+    if (not rot):
+        # print (f"going to: {endCells[index].location}")
+        myTable.goToCell(endCells[index], runningCells, centersMM)
     # if (len(centers) > 0):
     #     tracker.Update(centers)
 
