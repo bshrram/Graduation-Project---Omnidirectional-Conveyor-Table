@@ -6,7 +6,7 @@ import time
 if __name__ == '__main__' :
 
     # Start default camera
-    video = cv2.VideoCapture("http://192.168.1.107:8080/video");
+    video = cv2.VideoCapture("http://192.168.137.177:8080/video");
     
     # Find OpenCV version
     (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
