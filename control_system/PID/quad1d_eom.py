@@ -50,7 +50,7 @@ def ydot(y, t, pid):
             y1dot = g + c/m*u - 0.75*y1
     else: # otherwise quadrotor is already in the air
         y0dot = y1
-        y1dot = g + c/m*u - 0.75*y1
+        y1dot = g + c/m * u - 0.75*y1
 
     y0 += y0dot*dt
     y1 += y1dot*dt
