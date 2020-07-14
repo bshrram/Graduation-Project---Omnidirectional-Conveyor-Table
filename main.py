@@ -128,20 +128,20 @@ while True:
     if (not rot):
         # print (f"going to: {endCells[index].location}")
         myTable.goToCell(endCells[index], runningCells, centersMM)
-    # if (len(centers) > 0):
-    #     tracker.Update(centers)
+    if (len(centers) > 0):
+        tracker.Update(centers)
 
-    # for i in range(len(tracker.tracks)):
-    #     if (len(tracker.tracks[i].trace) > 1):
-    #         for j in range(len(tracker.tracks[i].trace)-1):
-    #             # Draw trace line
-    #             x1 = tracker.tracks[i].trace[j][0][0]
-    #             y1 = tracker.tracks[i].trace[j][1][0]
-    #             x2 = tracker.tracks[i].trace[j+1][0][0]
-    #             y2 = tracker.tracks[i].trace[j+1][1][0]
-    #             clr = tracker.tracks[i].track_id % 9
-    #             cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
-    #                     track_colors[clr], 2)
+    for i in range(len(tracker.tracks)):
+        if (len(tracker.tracks[i].trace) > 1):
+            for j in range(len(tracker.tracks[i].trace)-1):
+                # Draw trace line
+                x1 = tracker.tracks[i].trace[j][0][0]
+                y1 = tracker.tracks[i].trace[j][1][0]
+                x2 = tracker.tracks[i].trace[j+1][0][0]
+                y2 = tracker.tracks[i].trace[j+1][1][0]
+                clr = tracker.tracks[i].track_id % 9
+                cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
+                        track_colors[clr], 2)
 
     # # Display the resulting tracking frame
     cv.imshow('Tracking', frame)
