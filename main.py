@@ -36,7 +36,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (127, 0, 255), (127, 0, 127)]
 
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.106:8080/video')
+capture = cv.VideoCapture('http://192.168.1.101:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
@@ -45,7 +45,7 @@ frames =0
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[3,0],[0,0], [2,2], [0,4], [3,4]]
+locations = [[3,0],[0,0], [2,2], [0,4], [3,3]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
 rot = False
@@ -88,7 +88,7 @@ while True:
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
     runningCells = myTable.getCellsByNearLocation(centersMM, 4)
-    if calculateDistance(centersMM, endCells[index].coordinates) < 75:
+    if calculateDistance(centersMM, endCells[index].coordinates) < 100:
         #  rot = True
         index = (index+1) %len(locations)
     # else:
