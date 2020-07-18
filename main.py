@@ -36,7 +36,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (127, 0, 255), (127, 0, 127)]
 
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.101:8080/video')
+capture = cv.VideoCapture('http://192.168.137.201:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
@@ -45,10 +45,15 @@ frames =0
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[3,0],[0,0], [2,2], [0,4], [3,3]]
+locations = [[3,0],[0,0], [2,2], [0,4], [3,4]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
 rot = False
+
+count = 0
+ref = 0
+xp, yp = (0, 0)
+b = 0
 while True:
     keyboard = cv.waitKey(1)
     if keyboard == 'q' or keyboard == 27:
@@ -127,22 +132,61 @@ while True:
 
     if (not rot):
         # print (f"going to: {endCells[index].location}")
-        myTable.goToCell(endCells[index], runningCells, centersMM)
-    if (len(centers) > 0):
-        tracker.Update(centers)
+        if (b):
+            print(f'count: {count}')
+            w = 70
+            for i in range(len(runningCells)):
+                myTable.move(runningCells[i], 0, 0, w)
+            count -= 1
+            if count == 0:
+                b=0
+            continue
+        
+        else :
+            print("move")
+            myTable.goToCell(endCells[index], runningCells, centersMM)
 
-    for i in range(len(tracker.tracks)):
-        if (len(tracker.tracks[i].trace) > 1):
-            for j in range(len(tracker.tracks[i].trace)-1):
-                # Draw trace line
-                x1 = tracker.tracks[i].trace[j][0][0]
-                y1 = tracker.tracks[i].trace[j][1][0]
-                x2 = tracker.tracks[i].trace[j+1][0][0]
-                y2 = tracker.tracks[i].trace[j+1][1][0]
-                clr = tracker.tracks[i].track_id % 9
-                cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
-                        track_colors[clr], 2)
+        xcur = centers[0][0]
+        ycur = centers[0][1]
+        dis = calculateDistance((xcur, ycur), (xp, yp))
+        xp = xcur
+        yp = ycur
+        if (dis < 6):
+            count+=1
+            if count >= 10:
+                b=1
+        else:
+            count = 0
 
+    # if (len(centers) > 0):
+    #     tracker.Update(centers)
+
+    # for i in range(len(tracker.tracks)):
+    #     if (len(tracker.tracks[i].trace) > 1):
+    #         for j in range(len(tracker.tracks[i].trace)-1):
+    #             # Draw trace line
+    #             x1 = tracker.tracks[i].trace[j][0][0]
+    #             y1 = tracker.tracks[i].trace[j][1][0]
+    #             x2 = tracker.tracks[i].trace[j+1][0][0]
+    #             y2 = tracker.tracks[i].trace[j+1][1][0]
+    #             clr = tracker.tracks[i].track_id % 9
+    #             cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
+    #                     track_colors[clr], 2)
+
+    # l = len(tracker.tracks[i].trace)          
+    # if (l > 1):
+    #     xcur = tracker.tracks[0].trace[l-1][0][0]
+    #     ycur = tracker.tracks[0].trace[l-1][1][0]
+    #     xp = tracker.tracks[0].trace[l-2][0][0]
+    #     yp = tracker.tracks[0].trace[l-2][1][0]
+    #     dis = calculateDistance((xcur, ycur), (xp, yp))
+    #     ref = dis - ref
+    #     print (ref)
+    #     if (ref < 10):
+    #         count+=1
+    #     else:
+    #         count = 0
+    
     # # Display the resulting tracking frame
     cv.imshow('Tracking', frame)
 
