@@ -17,7 +17,7 @@ class KalmanFilter(object):
         Return:
             None
         """
-        self.dt = 0.005  # delta time
+        self.dt = 1/27 # delta time
 
         self.A = np.array([[1, 0], [0, 1]])  # matrix in observation equations
         self.u = np.zeros((2, 1))  # previous state vector
