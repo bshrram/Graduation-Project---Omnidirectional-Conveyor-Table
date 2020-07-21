@@ -67,16 +67,17 @@ class Table:
         return a
     
     def goToCell(self, cell, cells, boxCenter):
+        speed = 170
         runningCells = []
         for i in range(len(cells)):
             comCells = self.getCommonCells(cells[i])
             if (cell.id == cells[i].id):
                 angle = self.getAngle(boxCenter, cell.coordinates)
-                self.move(cell, angle, 200, 0)
+                self.move(cell, angle, speed, 0)
                 runningCells += comCells
                 continue
             angle  = self.getAngle(cells[i].coordinates, cell.coordinates)
-            self.move(cells[i], angle, 200, 0)
+            self.move(cells[i], angle, speed, 0)
             runningCells += comCells
 
         restCells = [cell for cell in self.cells if cell not in runningCells]
@@ -87,11 +88,12 @@ class Table:
             restCells[i].stop(comCells)
 
     def goToLocation(self, location, cells):
+        speed = 175
         runningCells = []
         for i in range(len(cells)):
             comCells = self.getCommonCells(cells[i])
             angle  = self.getAngle(cells[i].coordinates, location)
-            cells[i].move(angle, 200, 0, comCells)
+            cells[i].move(angle, speed, 0, comCells)
             runningCells += comCells
 
         restCells = [cell for cell in self.cells if cell not in runningCells]
