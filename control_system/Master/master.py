@@ -1,16 +1,18 @@
 from pymata4 import pymata4
 
 #board = pymata4.Pymata4(com_port="COM9")
-board = pymata4.Pymata4()
-board.set_pin_mode_i2c()
+try:
+    board = pymata4.Pymata4()
+    board.set_pin_mode_i2c()
 
-for i in range(2,14):
-    board.set_pin_mode_pwm_output(i)
+    for i in range(2,14):
+        board.set_pin_mode_pwm_output(i)
 
-for i in range(22, 54):
-    board.set_pin_mode_digital_output(i)
+    for i in range(22, 54):
+        board.set_pin_mode_digital_output(i)
 
-
+except:
+    pass
 
 def init_pins():
     pass

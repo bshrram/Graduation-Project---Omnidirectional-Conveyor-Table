@@ -3,7 +3,7 @@ from common import *
 import math
 
 row = 4
-col = 5
+col = 10
 class Table:
     """Table class that contains cells
     Attributes:
@@ -87,12 +87,12 @@ class Table:
             comCells = self.getCommonCells(restCells[i])
             restCells[i].stop(comCells)
 
-    def goToLocation(self, location, cells):
+    def goToLocation(self, location, cells, centersMM):
         speed = 175
         runningCells = []
         for i in range(len(cells)):
             comCells = self.getCommonCells(cells[i])
-            angle  = self.getAngle(cells[i].coordinates, location)
+            angle  = self.getAngle(centersMM, location)
             cells[i].move(angle, speed, 0, comCells)
             runningCells += comCells
 
