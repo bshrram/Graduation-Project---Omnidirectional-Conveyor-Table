@@ -107,11 +107,11 @@ class Tracker(object):
         for i in range(len(assignment)):
             if (assignment[i] != -1):
                 # check for cost distance threshold.
-                # If cost is very high then un_assign (delete) the track
+                # If cost is very high then un_assign the track
                 if (cost[i][assignment[i]] > self.dist_thresh):
                     assignment[i] = -1
                     un_assigned_tracks.append(i)
-                pass
+                
             else:
                 self.tracks[i].skipped_frames += 1
 
@@ -120,7 +120,7 @@ class Tracker(object):
         for i in range(len(self.tracks)):
             if (self.tracks[i].skipped_frames > self.max_frames_to_skip):
                 del_tracks.append(i)
-        if len(del_tracks) > 0:  # only when skipped frame exceeds max
+        if len(del_tracks) > 0: 
             for id in del_tracks:
                 if id < len(self.tracks):
                     del self.tracks[id]
