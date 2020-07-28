@@ -10,6 +10,8 @@ from feedback_system.tracker import Tracker
 from feedback_system.findTable import *
 from table import Table
 from data.cellDatabase import *
+from PID.pid_controller import PIDController
+from PID.p_controller import P_Controller
 from common import *
 import time
 parser = argparse.ArgumentParser()
@@ -36,7 +38,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (127, 0, 255), (127, 0, 127)]
 
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.106:8080/video')
+capture = cv.VideoCapture('http://192.168.1.104:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
@@ -45,10 +47,34 @@ frames =0
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[3,0],[0,0], [2,2], [0,4], [3,4]]
+locations = [[2,2]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
 rot = False
+
+count = 0
+ref = 0
+xp, yp = (0, 0)
+b = 0
+t = 0
+
+endAngle = 90
+y0 =0
+y1 = 0
+kp = 0.36
+ki = 0.40
+kd = 0.4
+
+umax = 80 # max controller output, (N)
+alpha = 0.8 # derivative filter smoothing factor
+pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
+        = [-umax, umax], alpha = alpha)
+pid.setTarget(endAngle)
+
+p = P_Controller(kp = kp)
+p.setTarget(endAngle)
+
+
 while True:
     keyboard = cv.waitKey(1)
     if keyboard == 'q' or keyboard == 27:
@@ -88,63 +114,101 @@ while True:
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
     runningCells = myTable.getCellsByNearLocation(centersMM, 4)
-    if calculateDistance(centersMM, endCells[index].coordinates) < 75:
-        #  rot = True
+    if calculateDistance(centersMM, endCells[index].coordinates) < 50:
+        if not rot:
+            for i in range(20):
+                comCells = myTable.getCommonCells(myTable.cells[i])
+                myTable.cells[i].stop(comCells)
+        rot = True
         index = (index+1) %len(locations)
-    # else:
-    #     rot = False
+    else:
+        rot = False
     if (rot):
-        endAngle = myTable.getAngle(endCells[index].coordinates, endCells[(index+1) % len(locations)].coordinates)
-        angle += 90
-        angle %= 180
-        endAngle %= 180
         w = endAngle - angle
         print(angle, endAngle)
         # print (w)
         # print(f"rotating {endCells[index].location}")
-        if (abs(w)< 10):
-            index = (index+1) %len(locations)
-            rot = False
-            continue
-        w = 70
-        myTable.move(endCells[index], 0, 0, w)
-        [x, y] = endCells[index].location 
-        dx = [-1, 1, 0]
-        if x%2 ==1:
-            dy = [0, 0, 1]
+        if (abs(w)< 8):
+            count += 1
+            if (count>15):
+                for i in range(20):
+                    comCells = myTable.getCommonCells(myTable.cells[i])
+                    myTable.cells[i].stop(comCells)
+                time.sleep(.2)
+                break
         else:
-            dy = [-1, -1, 1]
-        rotatingCells = []
-        for i in range(len(dx)):
-            cell = myTable.getCellByLocation([x + dx[i], y+ dy[i]])
-            if cell is not None:
-                rotatingCells.append(cell)
+            count = 0
         
-        for i in range(len(rotatingCells)):
-            if rotatingCells[i].id == endCells[index].id:
-                continue
-            myTable.move(rotatingCells[i], 0, 0, -w)
+        
+        # time step, (sec)
+
+        dt = t - p.last_timestamp_
+        # Control effort
+        u = pid.update(y0,t)
+        
+        y1dot = u
+        y1 += y1dot*dt
+        
+        y0 = angle
+        if u<0:
+            u = max(-90, min(-50, u))
+        else :
+            u = max(50, min(90, u))
+        print (u)
+        myTable.move(endCells[index], 0, 0, -u)
+        t+=1/27
+        [x, y] = endCells[index].location 
+
+        # dx = [-1, 1, 0]
+        # if x%2 ==1:
+        #     dy = [0, 0, 1]
+        # else:
+        #     dy = [-1, -1, 1]
+        # rotatingCells = []
+        # for i in range(len(dx)):
+        #     cell = myTable.getCellByLocation([x + dx[i], y+ dy[i]])
+        #     if cell is not None:
+        #         rotatingCells.append(cell)
+        
+        # for i in range(len(rotatingCells)):
+        #     if rotatingCells[i].id == endCells[index].id:
+        #         continue
+        #     myTable.move(rotatingCells[i], 0, 0, -w)
 
     if (not rot):
         # print (f"going to: {endCells[index].location}")
         myTable.goToCell(endCells[index], runningCells, centersMM)
-    if (len(centers) > 0):
-        tracker.Update(centers)
 
-    for i in range(len(tracker.tracks)):
-        if (len(tracker.tracks[i].trace) > 1):
-            for j in range(len(tracker.tracks[i].trace)-1):
-                # Draw trace line
-                x1 = tracker.tracks[i].trace[j][0][0]
-                y1 = tracker.tracks[i].trace[j][1][0]
-                x2 = tracker.tracks[i].trace[j+1][0][0]
-                y2 = tracker.tracks[i].trace[j+1][1][0]
-                clr = tracker.tracks[i].track_id % 9
-                cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
-                        track_colors[clr], 2)
+    # if (len(centers) > 0):
+    #     tracker.Update(centers)
 
+    # for i in range(len(tracker.tracks)):
+    #     if (len(tracker.tracks[i].trace) > 1):
+    #         for j in range(len(tracker.tracks[i].trace)-1):
+    #             # Draw trace line
+    #             x1 = tracker.tracks[i].trace[j][0][0]
+    #             y1 = tracker.tracks[i].trace[j][1][0]
+    #             x2 = tracker.tracks[i].trace[j+1][0][0]
+    #             y2 = tracker.tracks[i].trace[j+1][1][0]
+    #             clr = tracker.tracks[i].track_id % 9
+    #             cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
+    #                     track_colors[clr], 2)
+
+    # l = len(tracker.tracks[i].trace)          
+    # if (l > 1):
+    #     xcur = tracker.tracks[0].trace[l-1][0][0]
+    #     ycur = tracker.tracks[0].trace[l-1][1][0]
+    #     xp = tracker.tracks[0].trace[l-2][0][0]
+    #     yp = tracker.tracks[0].trace[l-2][1][0]
+    #     dis = calculateDistance((xcur, ycur), (xp, yp))
+    #     ref = dis - ref
+    #     print (ref)
+    #     if (ref < 10):
+    #         count+=1
+    #     else:
+    #         count = 0
+    
     # # Display the resulting tracking frame
     cv.imshow('Tracking', frame)
 
     
-

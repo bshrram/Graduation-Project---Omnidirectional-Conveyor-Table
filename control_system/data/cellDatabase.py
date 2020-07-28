@@ -194,8 +194,11 @@ cellDatabase = [
 k = 0
 for i in range(4):
     for j in range(5):
+        j1 = j*2
+        if i%2 == 1:
+            j1 = j1 + 1
         cellDatabase[k]['id'] = ids[i][j]
-        cellDatabase[k]['location'] = [i, j]
+        cellDatabase[k]['location'] = [i, j1]
         k += 1
 
 y0 = 163.75
@@ -208,9 +211,10 @@ for i in range(4):
     if i == 1 or i == 3:
         x0 = x0+dx/2
     for j in range(5):
-        location = (x0, y0)
+        location = [x0, y0]
         cellDatabase[r]['coordinates'] = location
-        print(cellDatabase[r]['coordinates'])
+        # print(cellDatabase[r]['coordinates'])
         x0 = x0+dx
         r+= 1
     y0=y0+dy
+
