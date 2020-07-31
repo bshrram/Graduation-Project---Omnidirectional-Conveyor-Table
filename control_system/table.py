@@ -66,13 +66,15 @@ class Table:
             a = 360 + a
         return a
     
-    def goToCell(self, cell, cells, boxCenter):
+    def goToCell(self, cell, centersMM):
         speed = 170
+        numRunningCells = 4
         runningCells = []
+        cells = self.getCellsByNearLocation(centersMM, numRunningCells)
         for i in range(len(cells)):
             comCells = self.getCommonCells(cells[i])
             if (cell.id == cells[i].id):
-                angle = self.getAngle(boxCenter, cell.coordinates)
+                angle = self.getAngle(centersMM, cell.coordinates)
                 self.move(cell, angle, speed, 0)
                 runningCells += comCells
                 continue
@@ -87,9 +89,11 @@ class Table:
             comCells = self.getCommonCells(restCells[i])
             restCells[i].stop(comCells)
 
-    def goToLocation(self, location, cells, centersMM):
+    def goToLocation(self, location, centersMM):
         speed = 175
         runningCells = []
+        numRunningCells = 4
+        cells = self.getCellsByNearLocation(centersMM, numRunningCells)
         for i in range(len(cells)):
             comCells = self.getCommonCells(cells[i])
             angle  = self.getAngle(centersMM, location)
@@ -108,5 +112,45 @@ class Table:
         comCells = self.getCommonCells(cell)
         cell.move(angle, speed, w, comCells)
 
-    def rotate(self, cell, angle):
-        self.move(cell, 0, 0, )
+    def rotate(self, cell, w):
+        comCells = self.getCommonCells(cell)
+        cell.move(0, 0, w, comCells)
+
+    def followPath(self, path, centersMM, angle, index, hanging, speed=170):
+        #Todo: if end cell on right or left edge, rotate to 90
+        # else if on up or down edge rotate 0
+
+        [hang, hangFrames, dir] = hanging
+        runningCells = self.getCellsByNearLocation(centersMM, 4)
+
+        if calculateDistance(centersMM, path[index]) < 100:
+            index = (index+1) % len(path)
+
+        if (hang): 
+            # rotate to fix hanging in location
+            # print(f'count: {count}')
+            w = 140 * dir
+            for i in range(len(runningCells)):
+                self.rotate(runningCells[i], w)
+            hangFrames -= 1
+            if hangFrames == 0:
+                hang = 0
+
+        else:
+            #print("move")
+            self.goToLocation(path[index], centersMM)
+
+        return [index, hang, hangFrames]
+        
+
+    def isHanging(self, hang, hangFrames, curPos, pastPos, dir):
+        dis = calculateDistance(curPos, pastPos)
+        if (dis < 6):
+            hangFrames += 1
+            if hangFrames >= 10:
+                hangFrames *= 2.5
+                b = 1
+                dir *= -1
+        else:
+            hangFrames = 0
+        return [hang, hangFrames, dir]

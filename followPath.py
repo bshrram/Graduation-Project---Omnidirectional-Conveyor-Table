@@ -24,11 +24,8 @@ parser.add_argument('--train', type=str,
                     help='Path to a video or a sequence of image.', default='data/videos/2.mp4')
 args = parser.parse_args()
 
-if args.algo == 'MOG2':
-    detector = Detector(type="MOG2")
-elif args.algo == 'KNN':
-    detector = Detector(type="KNN")
-elif args.algo == 'COLOR':
+
+if args.algo == 'COLOR':
     lower_blue = np.array([105, 50, 50])
     upper_blue = np.array([130, 255, 255])
     detector = Detector(type="COLOR", color=(lower_blue, upper_blue))
@@ -49,23 +46,17 @@ inf = 999999991
 corners = [[0, 0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
 
-y0 = 163.75
-x0 = 165.8
-dy = 157.5
-dx = 90.93 * 2
 
-rng = 10
 locations = pathCoordinates(dijPath(4, 10, [0,0], [3,9]), myTable)
 locations = smooth(locations)
 
 endCells = list(map(myTable.getCellByLocation, locations))
 index = 0
-rot = False
 
-count = 0
-xp, yp = (0, 0) # xpast, ypast
-b = 0 # boolean to move or rotate
+pastPos = (0, 0) # xpast, ypast
 dir = 1 # direction of rotate
+hang = 0
+hangFrames = 0
 while True:
     keyboard = cv.waitKey(1)
     if keyboard == 'q' or keyboard == 27:
@@ -91,7 +82,7 @@ while True:
         corners[3][0] = max(corners[3][0], corners1[3][0])
         corners[3][1] = min(corners[3][1], corners1[3][1])
 
-        # print(corners1)
+        
         continue
     if frames < 100:
         continue
@@ -104,75 +95,16 @@ while True:
 
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
-    runningCells = myTable.getCellsByNearLocation(centersMM, 4)
-    if calculateDistance(centersMM, locations[index]) < 100:
-        #  rot = True
-        index = (index+1) % len(locations)
-    # else:
-    #     rot = False
-    if (rot):
-        endAngle = myTable.getAngle(
-            endCells[index].coordinates, endCells[(index+1) % len(locations)].coordinates)
-        angle += 90
-        angle %= 180
-        endAngle %= 180
-        w = endAngle - angle
-        print(angle, endAngle)
-        # print (w)
-        # print(f"rotating {endCells[index].location}")
-        if (abs(w) < 10):
-            index = (index+1) % len(locations)
-            rot = False
-            continue
-        w = 70
-        myTable.move(endCells[index], 0, 0, w)
-        [x, y] = endCells[index].location
-        dx = [-1, 1, 0]
-        if x % 2 == 1:
-            dy = [0, 0, 1]
-        else:
-            dy = [-1, -1, 1]
-        rotatingCells = []
-        for i in range(len(dx)):
-            cell = myTable.getCellByLocation([x + dx[i], y + dy[i]])
-            if cell is not None:
-                rotatingCells.append(cell)
 
-        for i in range(len(rotatingCells)):
-            if rotatingCells[i].id == endCells[index].id:
-                continue
-            myTable.move(rotatingCells[i], 0, 0, -w)
+    h = [hang, hangFrames, dir]
+    [index, hang, hangFrames] = myTable.followPath(locations, centersMM, angle, index, h)
+    if hang: 
+        continue
 
-    if (not rot):
-        if (b): 
-            # rotate to fix hanging in location
-            # print(f'count: {count}')
-            w = 140 * dir
-            for i in range(len(runningCells)):
-                myTable.move(runningCells[i], 0, 0, w)
-            count -= 1
-            if count == 0:
-                b = 0
-            continue
-
-        else:
-            #print("move")
-            myTable.goToLocation(locations[index], runningCells, centersMM)
-
-        # subtract cur pos of past pos
-        xcur = centers[0][0]
-        ycur = centers[0][1]
-        dis = calculateDistance((xcur, ycur), (xp, yp))
-        xp = xcur
-        yp = ycur
-        if (dis < 6):
-            count += 1
-            if count >= 10:
-                count *= 2.5
-                b = 1
-                dir *= -1
-        else:
-            count = 0
+    curPos = (centers[0][0], centers[0][1])
+    [hang, hangFrames, dir] = myTable.isHanging(hang, hangFrames, curPos, pastPos, dir)
+    pastPos = curPos
+    
 
     # if (len(centers) > 0):
     #     tracker.Update(centers)
@@ -202,4 +134,4 @@ while True:
     #         count = 0
 
     # # Display the resulting tracking frame
-    cv.imshow('Tracking', frame)
+    #cv.imshow('Tracking', frame)
