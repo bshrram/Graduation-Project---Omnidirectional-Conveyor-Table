@@ -58,6 +58,12 @@ class Detector:
             hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV) 
             fgMask = cv.inRange(hsv, lower, upper)
             #res = cv.bitwise_and(frame, frame, fgMask=fgMask)
+        h, w = frame.shape[:2]
+        mask = np.zeros((h+2, w+2), np.uint8)
+        maskCopy = fgMask.copy()
+        cv.floodFill(maskCopy, mask, (0,0), 255)
+        mask_inv = cv.bitwise_not(maskCopy)
+        fgMask = fgMask | mask_inv
         
         contours, hierarchy = cv.findContours(
             fgMask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
