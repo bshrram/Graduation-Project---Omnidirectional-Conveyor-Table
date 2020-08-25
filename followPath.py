@@ -36,22 +36,21 @@ tracker = Tracker(160, 30, 10, 100)
 track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                 (0, 255, 255), (255, 0, 255), (255, 127, 255),
                 (127, 0, 255), (127, 0, 127)]
-
+detectorqr = cv.QRCodeDetector()
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.106:8080/video')
+capture = cv.VideoCapture('http://192.168.137.84:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
-
+r= False
 frames = 0
 inf = 999999991
 corners = [[0, 0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-
-
 locations = pathCoordinates(dijPath(4, 10, [2,0], [1,9] ), myTable)
 endCells = list(map(myTable.getCellByLocation, locations))
 locations = smooth(locations)
+
 
 
 index = 0
@@ -114,7 +113,19 @@ while True:
     h1, w1 = frame.shape[:2]
     if len(centers) == 0:
         continue
-
+    if r == False:
+        data, bbox, _ = detectorqr.detectAndDecode(frame)   
+    if data and r == False:
+        if data == "bshr":
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [1,9] ), myTable)
+            print("ok")
+        else:
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [2,0] ), myTable)
+        endCells = list(map(myTable.getCellByLocation, locations))
+        locations = smooth(locations)
+        print("QR Code detected-->", data)
+        r=1
+    
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
 
@@ -126,6 +137,7 @@ while True:
             loc = (cell.coordinates[0]+ 150, cell.coordinates[1])
             myTable.goToLocation(loc, centersMM)
             if calculateDistance(centersMM, loc) < 50:
+                r=1
                 for i in range(20):
                     comCells = myTable.getCommonCells(myTable.cells[i])
                     myTable.cells[i].stop(comCells)
