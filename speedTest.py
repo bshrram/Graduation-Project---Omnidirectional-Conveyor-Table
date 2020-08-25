@@ -48,7 +48,7 @@ fps = 25
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[0,0]]
+locations = [[1,9]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
 rot = False
@@ -141,7 +141,7 @@ while True:
             count += 1
             if (count>15):
                 goOut = 1
-               
+                rot = 0
                 continue
         else:
             count = 0
@@ -149,7 +149,7 @@ while True:
         
         # time step, (sec)
 
-        dt = t - p.last_timestamp_
+        dt = t - pid.last_timestamp_
         # Control effort
         u = pid.update(y0,t)
         
@@ -187,8 +187,9 @@ while True:
         x0 = 165.8
         dy = 157.5
         dx = 90.93 * 2
-        loc = (0, y0+ 0*dy)
-        myTable.goToLocation(loc, runningCells[:1])
+        cell = runningCells[0]
+        loc = (cell.coordinates[0]+ 200, cell.coordinates[1])
+        myTable.goToLocation(loc, centersMM)
         if calculateDistance(centersMM, loc) < 50:
             for i in range(20):
                 comCells = myTable.getCommonCells(myTable.cells[i])
@@ -205,7 +206,7 @@ while True:
         print (f"d: {d}, tm: {tm},  v: {v}")
         print( f"xp, yp: {(xp,yp)}")
         (xp, yp) = centersMM
-        myTable.goToCell(endCells[index], runningCells, centersMM)
+        myTable.goToCell(endCells[index], centersMM)
 
     # if (len(centers) > 0):
     #     tracker.Update(centers)
