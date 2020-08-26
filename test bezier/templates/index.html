@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>omnidirectional conveyor table</title>
+  </head>
+  <link rel="stylesheet" type="text/css" media="all" href="{{ url_for('static', filename='css/styles.css')}}" />
+  <body>
+    <h1>draw Path</h1>
+
+    <canvas id="canvas" height="480" width="640" class="bezier"></canvas>
+    <pre id="code">code</pre>
+    <form action="/followPath" method="get" id="form1"></form>
+    <button type="submit" form="form1" value="Submit">Submit</button>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/curves.js')}}"></script>
+  </body>
+</html>
