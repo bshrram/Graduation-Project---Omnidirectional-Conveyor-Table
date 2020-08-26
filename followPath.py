@@ -30,7 +30,7 @@ if args.algo == 'COLOR':
     upper_blue = np.array([130, 255, 255])
     lower_black = np.array([95,45, 45 ])
     upper_black = np.array([140, 255, 255])
-    detector = Detector(type="COLOR", color=(lower_black, upper_black))
+    detector = Detector(type="COLOR", color=(lower_blue, upper_blue))
 
 tracker = Tracker(160, 30, 10, 100)
 track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
@@ -38,7 +38,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                 (127, 0, 255), (127, 0, 127)]
 detectorqr = cv.QRCodeDetector()
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.137.84:8080/video')
+capture = cv.VideoCapture('http://192.168.1.104:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
