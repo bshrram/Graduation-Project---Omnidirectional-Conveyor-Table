@@ -25,7 +25,11 @@ def send_css(path):
 @app.route('/followPath',methods = ['GET'])
 def follow():
     p1 = request.args.get('p1', '')
-    return "running"
+    p2 = request.args.get('p2', '')
+    cp1 = request.args.get('cp1', '')
+    cp2 = request.args.get('cp2', '')
+    
+    return p1+p2+cp1+cp2
 
 
 if __name__ == '__main__':
