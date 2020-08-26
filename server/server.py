@@ -5,6 +5,11 @@ from flask import request
 from flask import Flask, redirect, url_for, request
 app = Flask(__name__)
 
+import sys
+sys.path.insert(1, '../')
+
+from followBezier import followBezier
+
 @app.route('/dashboard/<name>')
 def dashboard(name):
    return 'welcome %s' % name
@@ -28,7 +33,9 @@ def follow():
     p2 = request.args.get('p2', '')
     cp1 = request.args.get('cp1', '')
     cp2 = request.args.get('cp2', '')
-    
+    points = [p1, cp1, cp2, p2]
+
+    followBezier(points)
     return p1+p2+cp1+cp2
 
 

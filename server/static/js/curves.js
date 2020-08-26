@@ -190,7 +190,7 @@
       }
 	}
 	
-    pointsUrl = `p1=(${point.p1.x}, ${point.p1.y})&p2=(${point.p2.x}, ${point.p2.y})&cp1=(${point.cp1.x}, ${point.cp1.y})&cp2=(${point.cp2.x}, ${point.cp2.y})`
+    pointsUrl = `p1=${point.p1.x},${point.p1.y}&p2=${point.p2.x},${point.p2.y}&cp1=${point.cp1.x}, ${point.cp1.y}&cp2=${point.cp2.x}, ${point.cp2.y}`
 	xhr.open('get', 'http://127.0.0.1:5000/followPath?' + pointsUrl, true)
     xhr.setRequestHeader(
       'Content-Type',

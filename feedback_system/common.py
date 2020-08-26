@@ -28,6 +28,13 @@ def pixelToMm(location,w1,h1):
     # print(w1, h1)
     return (xm, ym)
 
+def pixelToMmList(location,w1,h1):
+    [x,y]= location
+    xm = x * 1150/ w1
+    ym = y * 800 / h1
+    # print(w1, h1)
+    return [xm, ym]
+
 def mmToPixel(location,w1,h1):
     (x,y)= location
     xp = int(x * w1/1150)
