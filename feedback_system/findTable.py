@@ -78,7 +78,7 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
         if inlier:
             cv.line(vis, (x1, y1), (x2, y2), green)
 
-    cv.imshow(win, vis)
+    # cv.imshow(win, vis)
     return corners1
 
 

@@ -28,35 +28,56 @@ args = parser.parse_args()
 if args.algo == 'COLOR':
     lower_blue = np.array([105, 50, 50])
     upper_blue = np.array([130, 255, 255])
-    detector = Detector(type="COLOR", color=(lower_blue, upper_blue))
+    lower_black = np.array([95,45, 45 ])
+    upper_black = np.array([140, 255, 255])
+    detector = Detector(type="COLOR", color=(lower_black, upper_black))
 
 tracker = Tracker(160, 30, 10, 100)
 track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                 (0, 255, 255), (255, 0, 255), (255, 127, 255),
                 (127, 0, 255), (127, 0, 127)]
-
+detectorqr = cv.QRCodeDetector()
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.137.79:8080/video')
+capture = cv.VideoCapture('http://192.168.137.84:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
-
+r= False
 frames = 0
 inf = 999999991
 corners = [[0, 0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-
-
-locations = pathCoordinates(dijPath(4, 10, [0,0], [3,9]), myTable)
+locations = pathCoordinates(dijPath(4, 10, [2,0], [1,9] ), myTable)
+endCells = list(map(myTable.getCellByLocation, locations))
 locations = smooth(locations)
 
-endCells = list(map(myTable.getCellByLocation, locations))
+
+
 index = 0
 
 pastPos = (0, 0) # xpast, ypast
 dir = 1 # direction of rotate
 hang = 0
 hangFrames = 0
+
+endAngle = 90
+kp = 0.36
+ki = 0.40
+kd = 0.4
+umax = 150 # max controller output, (N)
+alpha = 0.8 # derivative filter smoothing factor
+pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
+        = [-umax, umax], alpha = alpha)
+
+pid.setTarget(endAngle)
+
+goOut = 0
+count = 0
+t = 0
+y0 =0
+y1 = 0
+fps = 25
+fRotate = 1
 while True:
     keyboard = cv.waitKey(1)
     if keyboard == 'q' or keyboard == 27:
@@ -84,7 +105,7 @@ while True:
 
         
         continue
-    if frames < 100:
+    if frames < 120:
         continue
     corners = np.float32(corners)
     frame = getTableFromFrame(corners, frame)
@@ -92,14 +113,80 @@ while True:
     h1, w1 = frame.shape[:2]
     if len(centers) == 0:
         continue
-
+    if r == False:
+        data, bbox, _ = detectorqr.detectAndDecode(frame)   
+    if data and r == False:
+        if data == "bshr":
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [1,9] ), myTable)
+            print("ok")
+        else:
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [2,0] ), myTable)
+        endCells = list(map(myTable.getCellByLocation, locations))
+        locations = smooth(locations)
+        print("QR Code detected-->", data)
+        r=1
+    
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
 
     h = [hang, hangFrames, dir]
+
+    if index == -1:
+        cell = myTable.getCellsByNearLocation(centersMM, 1)[0]
+        if goOut:
+            loc = (cell.coordinates[0]+ 150, cell.coordinates[1])
+            myTable.goToLocation(loc, centersMM)
+            if calculateDistance(centersMM, loc) < 50:
+                r=1
+                for i in range(20):
+                    comCells = myTable.getCommonCells(myTable.cells[i])
+                    myTable.cells[i].stop(comCells)
+                time.sleep(.2)
+                break
+            print('going out')
+            continue
+        print ('rotating')
+        if fRotate:
+            cells = myTable.getCellsByNearLocation(centersMM, 4)
+            for cell in cells:
+                myTable.stopCell(cell)
+            fRotate = 0
+        w = endAngle - angle
+        # print(angle, endAngle)
+
+        if (abs(w)< 9):
+            count += 1
+            if (count>10):
+                goOut = 1
+                continue
+        else:
+            count = 0
+        
+        
+        # time step, (sec)
+
+        dt = t - pid.last_timestamp_
+        # Control effort
+        u = pid.update(y0,t)
+        
+        y1dot = u
+        y1 += y1dot*dt
+        
+        y0 = angle
+        if u<0:
+            u = max(-umax, min(-50, u))
+        else :
+            u = max(50, min(umax, u))
+        # print (u)
+        myTable.move(cell, 0, 0, -u)
+        t+=1/fps
+        [x, y] = cell.location
+        continue
+
     [index, hang, hangFrames] = myTable.followPath(locations, centersMM, angle, index, h)
     if hang: 
         continue
+
 
     curPos = (centers[0][0], centers[0][1])
     [hang, hangFrames, dir] = myTable.isHanging(hang, hangFrames, curPos, pastPos, dir)

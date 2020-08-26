@@ -115,6 +115,10 @@ class Table:
     def rotate(self, cell, w):
         comCells = self.getCommonCells(cell)
         cell.move(0, 0, w, comCells)
+    
+    def stopCell(self, cell):
+        comCells = self.getCommonCells(cell)
+        cell.stop(comCells)
 
     def followPath(self, path, centersMM, angle, index, hanging, speed=170):
         #Todo: if end cell on right or left edge, rotate to 90
@@ -123,8 +127,11 @@ class Table:
         [hang, hangFrames, dir] = hanging
         runningCells = self.getCellsByNearLocation(centersMM, 4)
 
-        if calculateDistance(centersMM, path[index]) < 100:
-            index = (index+1) % len(path)
+        if calculateDistance(centersMM, path[index]) < 50:
+            index = index+1
+            if index == len(path):
+                index = -1
+                return [index, hang, hangFrames]
 
         if (hang): 
             # rotate to fix hanging in location
