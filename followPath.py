@@ -71,7 +71,7 @@ pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
 
 pid.setTarget(endAngle)
 
-goOut = 0
+waitingBox = 0
 count = 0
 t = 0
 y0 =0
@@ -114,7 +114,18 @@ while True:
     if len(centers) == 0:
         continue
     if r == False:
-        data, bbox, _ = detectorqr.detectAndDecode(frame)   
+        data = None
+        startX = 0
+        startY = myTable.getCellByLocation([0,4]).coordinates[0] - 150
+        [startX, startY] = mmToPixel([startX, startY], 640, 480)
+        print(startY)
+        print(startX)
+        cropFrame = frame[startX:startX+300, startY:startY+300]
+        cv.imshow("cropFrame", cropFrame)
+        data, bbox, _ = detectorqr.detectAndDecode(cropFrame)  
+        if not data:
+            continue
+        
     if data and r == False:
         if data == "bshr":
             locations = pathCoordinates(dijPath(4, 10, [0,4], [1,9] ), myTable)
@@ -125,6 +136,7 @@ while True:
         locations = smooth(locations)
         print("QR Code detected-->", data)
         r=1
+        waitingBox = 0 
     
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
@@ -133,17 +145,20 @@ while True:
 
     if index == -1:
         cell = myTable.getCellsByNearLocation(centersMM, 1)[0]
-        if goOut:
-            loc = (cell.coordinates[0]+ 150, cell.coordinates[1])
-            myTable.goToLocation(loc, centersMM)
-            if calculateDistance(centersMM, loc) < 50:
-                r=1
-                for i in range(20):
-                    comCells = myTable.getCommonCells(myTable.cells[i])
-                    myTable.cells[i].stop(comCells)
-                time.sleep(.2)
-                break
-            print('going out')
+        if waitingBox:
+            r=0
+            for i in range(20):
+                comCells = myTable.getCommonCells(myTable.cells[i])
+                myTable.cells[i].stop(comCells)
+            time.sleep(.2)
+            print('waiting a box')
+            pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
+                  = [-umax, umax], alpha = alpha)
+            pid.setTarget(endAngle)
+            index = 0
+            t=0
+            y1 =0
+            fRotate = 1
             continue
         print ('rotating')
         if fRotate:
@@ -157,7 +172,7 @@ while True:
         if (abs(w)< 9):
             count += 1
             if (count>10):
-                goOut = 1
+                waitingBox = 1
                 continue
         else:
             count = 0

@@ -6,13 +6,10 @@ from flask import Flask, redirect, url_for, request
 app = Flask(__name__)
 
 import sys
-sys.path.insert(1, '../')
+sys.path.insert(3, './')
 
 from followBezier import followBezier
 
-@app.route('/dashboard/<name>')
-def dashboard(name):
-   return 'welcome %s' % name
 
 @app.route('/',methods = ['GET'])
 def rend():
@@ -40,5 +37,5 @@ def follow():
 
 
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run()
 
