@@ -150,14 +150,15 @@ class Table:
         return [index, hang, hangFrames]
         
 
-    def isHanging(self, hang, hangFrames, curPos, pastPos, dir):
+    def isHanging(self, hang, hangFrames, curPos, pastPos, dir1):
         dis = calculateDistance(curPos, pastPos)
         if (dis < 6):
             hangFrames += 1
-            if hangFrames >= 10:
+            if hangFrames >= 10 and hangFrames < 250:
                 hangFrames *= 2.5
-                b = 1
-                dir *= -1
+                hang = 1
         else:
+            dir1 *= -1
             hangFrames = 0
-        return [hang, hangFrames, dir]
+            hang = 0
+        return [hang, hangFrames, dir1]
