@@ -21,7 +21,7 @@ def getsize(img):
     h, w = img.shape[:2]
     return w, h
 
-def pixelToMm(location,w1,h1):
+def pixelToMm(location,w1=640,h1=480):
     (x,y)= location
     xm = x * 1150/ w1
     ym = y * 800 / h1
