@@ -36,13 +36,13 @@ tracker = Tracker(160, 30, 10, 100)
 track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                 (0, 255, 255), (255, 0, 255), (255, 127, 255),
                 (127, 0, 255), (127, 0, 127)]
-
+detectorqr = cv.QRCodeDetector()
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
 capture = cv.VideoCapture('http://192.168.1.104:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
-
+r= False
 frames = 0
 inf = 999999991
 corners = [[0, 0], [inf, 0], [inf, inf], [0, inf]]
@@ -71,7 +71,7 @@ pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
 
 pid.setTarget(endAngle)
 
-
+waitingBox = 0
 count = 0
 t = 0
 y0 =0
@@ -113,6 +113,30 @@ while True:
     h1, w1 = frame.shape[:2]
     if len(centers) == 0:
         continue
+    if r == False:
+        data = None
+        startX = 0
+        startY = myTable.getCellByLocation([0,4]).coordinates[0] - 150
+        [startX, startY] = mmToPixel([startX, startY], 640, 480)
+        print(startY)
+        print(startX)
+        cropFrame = frame[startX:startX+300, startY:startY+300]
+        cv.imshow("cropFrame", cropFrame)
+        data, bbox, _ = detectorqr.detectAndDecode(cropFrame)  
+        if not data:
+            continue
+        
+    if data and r == False:
+        if data == "bshr":
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [1,9] ), myTable)
+            print("ok")
+        else:
+            locations = pathCoordinates(dijPath(4, 10, [0,4], [2,0] ), myTable)
+        endCells = list(map(myTable.getCellByLocation, locations))
+        locations = smooth(locations)
+        print("QR Code detected-->", data)
+        r=1
+        waitingBox = 0 
     
     centersMM = pixelToMm((float(centers[0][0]), float(centers[0][1])), w1, h1)
     angle = angles[0][0]
@@ -121,6 +145,8 @@ while True:
 
     if index == -1:
         cell = myTable.getCellsByNearLocation(centersMM, 1)[0]
+        if waitingBox:
+            r=0
             for i in range(20):
                 comCells = myTable.getCommonCells(myTable.cells[i])
                 myTable.cells[i].stop(comCells)
@@ -146,6 +172,7 @@ while True:
         if (abs(w)< 9):
             count += 1
             if (count>10):
+                waitingBox = 1
                 continue
         else:
             count = 0
