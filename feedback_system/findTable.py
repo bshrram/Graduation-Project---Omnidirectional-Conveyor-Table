@@ -78,7 +78,7 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
         if inlier:
             cv.line(vis, (x1, y1), (x2, y2), green)
 
-    # cv.imshow(win, vis)
+    cv.imshow(win, vis)
     return corners1
 
 
@@ -86,7 +86,7 @@ scale_percent =25
 img1 = cv.imread(cv.samples.findFile('table.jpg'))
 width = int(img1.shape[1] * scale_percent / 100)
 height = int(img1.shape[0] * scale_percent / 100)
-img1 = cv.resize(img1, (width,height))
+#img1 = cv.resize(img1, (width,height))
 
 
 detector, matcher = init_feature()

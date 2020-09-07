@@ -137,6 +137,7 @@ class Table:
             # rotate to fix hanging in location
             # print(f'count: {count}')
             w = 140 * dir
+            print("hang")
             for i in range(len(runningCells)):
                 self.rotate(runningCells[i], w)
             hangFrames -= 1
@@ -154,7 +155,7 @@ class Table:
         dis = calculateDistance(curPos, pastPos)
         if (dis < 6):
             hangFrames += 1
-            if hangFrames >= 10 and hangFrames < 250:
+            if hangFrames >= 20 and hangFrames < 150:
                 hangFrames *= 2.5
                 hang = 1
         else:

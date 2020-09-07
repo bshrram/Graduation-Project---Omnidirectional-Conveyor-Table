@@ -41,7 +41,7 @@ def followBezier(points):
                     (127, 0, 255), (127, 0, 127)]
 
     #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-    capture = cv.VideoCapture('http://192.168.1.104:8080/video')
+    capture = cv.VideoCapture('http://192.168.43.167:8080/video')
     if not capture.isOpened:
         print('Unable to open: ' + args.input)
         exit(0)
