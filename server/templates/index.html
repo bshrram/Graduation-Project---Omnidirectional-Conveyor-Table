@@ -9,8 +9,51 @@
     <h1>draw Path</h1>
 
     <canvas id="canvas" height="480" width="640" class="bezier"></canvas>
+    <h1>BezierPath</h1>
     <pre id="code">code</pre>
     <input id= "followButton" type="submit" value="follow">
+
+
+    <br><br><br><br><br><br><br><br><br><br><br><br>
+    <h1>Classify Boxes</h1>
+    <form action="/classify" > 
+      <label for="type1">type1 out:</label>
+      <select id="type1" name="type1">
+        <option value="left">left</option>
+        <option value="right">right</option>
+      </select>
+      <br></br>
+      <label for="type2">type2 out:</label>
+      <select id="type2" name="type2">
+        <option value="left">left</option>
+        <option value="right">right</option>
+      </select>
+      <br>
+      <input type="submit" value="classify">
+    </form>
+    
+
+    <br><br>
+    <h1>Shortest Path</h1>
+    <form action="/shortestPath" > 
+      <h3>begin cell:</h3>
+      <label for="beginCellRow">cell row:</label>
+      <input type="text" name="beginCellRow">
+      <br>
+      <label for="beginCellColumn">cell column:</label>
+      <input type="text" name="beginCellColumn">
+      <br>
+      <h3>end cell:</h3>
+      <label for="endCellRow">cell row:</label>
+      <input type="text" name="endCellRow">
+      <br>
+      <label for="endCellColumn">cell column:</label>
+      <input type="text" name="endCellColumn">
+      <br>
+
+      <input type="submit" value="follow">
+    </form>
+    
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/curves.js')}}"></script>
   </body>

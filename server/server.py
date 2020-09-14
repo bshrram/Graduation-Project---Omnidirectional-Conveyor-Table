@@ -9,6 +9,14 @@ import sys
 sys.path.insert(3, './')
 
 from followBezier import followBezier
+from boxesClassifications import classifyBoxes
+from shortestPath import followshortestPath
+from table import Table
+from data.cellDatabase import *
+
+
+myTable = Table(cellDatabase)
+
 
 
 @app.route('/',methods = ['GET'])
@@ -32,8 +40,28 @@ def follow():
     cp2 = request.args.get('cp2', '')
     points = [p1, cp1, cp2, p2]
 
-    followBezier(points)
+    followBezier(myTable, points)
     return p1+p2+cp1+cp2
+
+@app.route('/classify',methods = ['GET'])
+def classify():
+    type1 = request.args.get('type1', '')
+    type2 = request.args.get('type2', '')
+    classifyBoxes(myTable, [type1, type2])
+    return redirect("http://127.0.0.1:5000", code=302)
+
+@app.route('/shortestPath',methods = ['GET'])
+def followShortestPath():
+    cell1Row = request.args.get('beginCellRow', '')
+    cell1Col = request.args.get('beginCellColumn', '')
+    cell2Row = request.args.get('endCellRow', '')
+    cell2Col = request.args.get('endCellColumn', '')
+
+    followshortestPath(myTable, [cell1Row, cell1Col], [cell2Row, cell2Col])
+    return redirect("http://127.0.0.1:5000", code=302)
+
+
+
 
 
 if __name__ == '__main__':
