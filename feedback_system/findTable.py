@@ -83,7 +83,7 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
 
 
 scale_percent =25
-img1 = cv.imread(cv.samples.findFile('table.jpg'))
+img1 = cv.imread(cv.samples.findFile('table7A.jpg'))
 width = int(img1.shape[1] * scale_percent / 100)
 height = int(img1.shape[0] * scale_percent / 100)
 #img1 = cv.resize(img1, (width,height))

@@ -121,19 +121,19 @@ while True:
 
     if index == -1:
         cell = myTable.getCellsByNearLocation(centersMM, 1)[0]
-            for i in range(20):
-                comCells = myTable.getCommonCells(myTable.cells[i])
-                myTable.cells[i].stop(comCells)
-            time.sleep(.2)
-            print('waiting a box')
-            pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
-                  = [-umax, umax], alpha = alpha)
-            pid.setTarget(endAngle)
-            index = 0
-            t=0
-            y1 =0
-            fRotate = 1
-            continue
+        for i in range(20):
+            comCells = myTable.getCommonCells(myTable.cells[i])
+            myTable.cells[i].stop(comCells)
+        time.sleep(.2)
+        print('waiting a box')
+        pid = PIDController(kp = kp, ki = ki, kd = kd, max_windup = 200, u_bounds
+                = [-umax, umax], alpha = alpha)
+        pid.setTarget(endAngle)
+        index = 0
+        t=0
+        y1 =0
+        fRotate = 1
+        continue
         print ('rotating')
         if fRotate:
             cells = myTable.getCellsByNearLocation(centersMM, 4)

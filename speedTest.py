@@ -38,7 +38,7 @@ track_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
                     (127, 0, 255), (127, 0, 127)]
 
 #capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-capture = cv.VideoCapture('http://192.168.1.100:8080/video')
+capture = cv.VideoCapture('http://192.168.43.1:8080/video')
 if not capture.isOpened:
     print('Unable to open: ' + args.input)
     exit(0)
@@ -48,7 +48,7 @@ fps = 25
 inf = 99999999
 corners = [[0,0], [inf, 0], [inf, inf], [0, inf]]
 myTable = Table(cellDatabase)
-locations = [[1,9]]
+locations = [[2,0]]
 endCells =list( map(myTable.getCellByLocation, locations))
 index = 0
 rot = False

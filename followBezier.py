@@ -30,7 +30,7 @@ elif args.algo == 'KNN':
     detector = Detector(type="KNN")
 elif args.algo == 'COLOR':
     lower_blue = np.array([105, 50, 50])
-    upper_blue = np.array([125, 255, 255])
+    upper_blue = np.array([130, 220, 220])
     detector = Detector(type="COLOR", color=(lower_blue, upper_blue))
 
 def followBezier(myTable, points):
@@ -98,7 +98,7 @@ def followBezier(myTable, points):
     locations = [pixelToMmList([x,y], 640, 480) for [x,y] in locations1]
     print(locations)
 
-
+    cornersList = []
     while True:
         keyboard = cv.waitKey(1)
         if keyboard == 'q' or keyboard == 27:
@@ -111,25 +111,29 @@ def followBezier(myTable, points):
         if frame is None:
             break
         
-        # frame = cv.resize(frame, (640, 360))
+        
         #frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         frames = frames + 1
         if frames < 50:
             corners1 = getCorners(frame)
-            corners[0][0] = max(corners[0][0], corners1[0][0])
-            corners[0][1] = max(corners[0][1], corners1[0][1])
-            corners[1][0] = min(corners[1][0], corners1[1][0])
-            corners[1][1] = max(corners[1][1], corners1[1][1])
-            corners[2][0] = min(corners[2][0], corners1[2][0])
-            corners[2][1] = min(corners[2][1], corners1[2][1])
-            corners[3][0] = max(corners[3][0], corners1[3][0])
-            corners[3][1] = min(corners[3][1], corners1[3][1])
-
-            
+            cornersList.append(corners1)
             continue
+
         if frames < 120:
             continue
-        corners = np.float32(corners)
+
+        if frames == 120:
+            cornersMean = np.mean(cornersList, axis=0)
+            cornersStd = np.std(cornersList, axis=0)
+            for i in range(len(cornersList)):
+                for j in range(len(cornersList[0])):
+                    for k in range(len(cornersList[0][0])):
+                        std = cornersStd[j][k]
+                        mean = cornersMean[j][k]
+                        if (cornersList[i][j][k] < mean - 2*std) or (cornersList[i][j][k] > mean + 2*std) : 
+                            cornersList[i][j][k] = mean
+
+            corners = np.mean(cornersList, axis=0)
         frame = getTableFromFrame(corners, frame)
         (centers, angles) = detector.Detect(frame)
         h1, w1 = frame.shape[:2]
