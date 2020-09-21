@@ -25,8 +25,8 @@ args = parser.parse_args()
 
 
 if args.algo == 'COLOR':
-    lower_blue = np.array([100, 50, 50])
-    upper_blue = np.array([140, 255, 255])
+    lower_blue = np.array([105, 50, 50])
+    upper_blue = np.array([130, 220, 220])
     lower_black = np.array([95,45, 45 ])
     upper_black = np.array([140, 255, 255])
     detector = Detector(type="COLOR", color=(lower_blue, upper_blue))
